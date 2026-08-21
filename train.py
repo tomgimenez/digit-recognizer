@@ -48,4 +48,5 @@ print('\n', classification_report(y_test, y_pred))
 # show_confusion_matrix(y_test, y_pred)
 
 joblib.dump(model, 'digit_model.joblib')
+joblib.dump((X_test, y_test), 'test_data.joblib')
 print('Model saved')
