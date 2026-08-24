@@ -96,18 +96,17 @@ export default function App() {
           <div className="brand-mark"><ScanLine size={21} strokeWidth={1.8} /></div>
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-cyan">Neural Vision Lab</p>
-            <h1 className="font-mono text-base font-bold tracking-[0.12em] text-foreground">DIGIT SCANNER <span className="text-cyan">// 01</span></h1>
+            <h1 className="font-mono text-base font-bold tracking-[0.12em] text-foreground">DIGIT RECOGNIZER</h1>
           </div>
         </div>
         <div className="hidden items-center gap-6 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground sm:flex">
-          <span className="flex items-center gap-2"><Activity size={13} className="text-cyan" /> System online</span>
+          {/* <span className="flex items-center gap-2"><Activity size={13} className="text-cyan" /> System online</span> */}
           <span className="flex items-center gap-2"><Cpu size={13} /> MNIST / v4.2</span>
         </div>
       </header>
 
       <div className="mx-auto w-full max-w-6xl px-5 py-10 md:px-8 md:py-14">
         <section className="mb-10 max-w-2xl">
-          <div className="mb-4 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.28em] text-amber"><span className="status-dot" /> Inference chamber ready</div>
           <h2 className="text-balance font-mono text-3xl font-bold leading-tight tracking-[-0.04em] text-foreground md:text-5xl">Draw a digit.<br /><span className="text-cyan">Let the machine see.</span></h2>
           <p className="mt-5 max-w-lg text-pretty font-sans text-sm leading-6 text-muted-foreground">A compact neural network trained on 70,000 handwritten samples. Your gesture enters the chamber; a probability field returns.</p>
         </section>
@@ -177,7 +176,7 @@ export default function App() {
       </div>
       <footer className="mx-auto flex w-full max-w-6xl items-center justify-between border-t border-border/70 px-5 py-6 font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground md:px-8">
         <span>Experimental interface / Developed by Tomas Gimenez</span>
-        <span className="hidden sm:block">Local inference protocol <span className="text-cyan">●</span></span>
+        {/* <span className="hidden sm:block">Local inference protocol <span className="text-cyan">●</span></span> */}
       </footer>
     </main>
   )
