@@ -130,9 +130,16 @@ export default function App() {
           </section>
 
           <section className="panel p-5 md:p-6" aria-labelledby="result-title">
-            <div className="mb-8 flex items-center justify-between border-b border-border/70 pb-4 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground"><span id="result-title" className="flex items-center gap-2 text-foreground"><span className="text-cyan">02</span> Inference result</span><Gauge size={15} className="text-cyan" /></div>
+            <div className="mb-8 flex items-center justify-between border-b border-border/70 pb-4 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+              <span id="result-title" className="flex items-center gap-2 text-foreground">
+                <span className="text-cyan">02</span> Inference result
+              </span>
+                <Gauge size={15} className="text-cyan" />
+            </div>
             <div className={`result-display ${result ? 'result-live' : ''}`}>
-              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Top classification</span><strong>{result ? result.prediction : '—'}</strong><span className="font-mono text-xs text-cyan">{result ? `${(result.probabilities[String(result.prediction)] * 100).toFixed(1)}% confidence` : 'Awaiting input'}</span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Top classification</span>
+              <strong>{result ? result.prediction : '—'}</strong>
+              <span className="font-mono text-xs text-cyan">{result ? `${(result.probabilities[String(result.prediction)] * 100).toFixed(1)}% confidence` : 'Awaiting input'}</span>
             </div>
             <div className="mt-8">
               <div className="mb-4 flex justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
@@ -155,11 +162,23 @@ export default function App() {
                 }
               </div>
             </div>
-            <div className="mt-9 border-t border-border/70 pt-4 font-mono text-[10px] uppercase tracking-[0.17em] text-muted-foreground"><div className="flex justify-between"><span>Latency</span><span className="text-foreground">{latencyMs !== null ? `${latencyMs} ms` : '—'}</span></div><div className="mt-3 flex justify-between"><span>Model state</span><span className="text-amber">{scanning ? 'Computing' : 'Standby'}</span></div></div>
+            <div className="mt-9 border-t border-border/70 pt-4 font-mono text-[10px] uppercase tracking-[0.17em] text-muted-foreground">
+              <div className="flex justify-between">
+                <span>Latency</span>
+                <span className="text-foreground">{latencyMs !== null ? `${latencyMs} ms` : '—'}</span>
+              </div>
+              <div className="mt-3 flex justify-between">
+                <span>Model state</span>
+                <span className="text-amber">{scanning ? 'Computing' : 'Standby'}</span>
+              </div>
+            </div>
           </section>
         </div>
       </div>
-      <footer className="mx-auto flex w-full max-w-6xl items-center justify-between border-t border-border/70 px-5 py-6 font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground md:px-8"><span>Neural Vision Lab / Experimental interface</span><span className="hidden sm:block">Local inference protocol <span className="text-cyan">●</span></span></footer>
+      <footer className="mx-auto flex w-full max-w-6xl items-center justify-between border-t border-border/70 px-5 py-6 font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground md:px-8">
+        <span>Experimental interface / Developed by Tomas Gimenez</span>
+        <span className="hidden sm:block">Local inference protocol <span className="text-cyan">●</span></span>
+      </footer>
     </main>
   )
 }
