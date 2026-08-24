@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from PIL import Image
 import joblib
@@ -8,6 +9,13 @@ import numpy as np
 import io
 
 app = FastAPI(title='Digit Recognizer API')
+
+app.add_middleware(
+   CORSMiddleware,
+   allow_origins= ['http://localhost:5173', 'http://127.0.0.1:5173'],
+   allow_methods= ['*'],
+   allow_headers= ['*']
+)
 
 model = joblib.load('../digit_model.joblib')
 
@@ -39,8 +47,18 @@ def preprocess_image(image_bytes: bytes) -> np.ndarray:
     # 2. Convertir a array de numpy
     pixel_array = np.array(image).astype(np.float32)
 
-    # 3. Invertir colores: MNIST espera fondo negro (0) y trazo blanco (255)
-    pixel_array = 255.0 - pixel_array
+    # 3. Detectar si el fondo es claro u oscuro, e invertir solo si hace falta
+    #    (MNIST espera fondo negro y trazo blanco)
+    corners = np.concatenate([
+      pixel_array[:5, :5].flatten(),
+      pixel_array[:5, -5:].flatten(),
+      pixel_array[-5:, :5].flatten(),
+      pixel_array[-5:, -5:].flatten(),
+    ])
+    background_is_light = corners.mean() > 127
+
+    if background_is_light:
+      pixel_array = 255.0 - pixel_array
 
     # 4. Eliminar ruido de fondo (valores muy bajos se van a 0)
     pixel_array[pixel_array < 30] = 0
