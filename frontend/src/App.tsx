@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Activity, Cpu, Eraser, Gauge, ScanLine, Sparkles, Zap } from 'lucide-react'
+import { Cpu, Eraser, Gauge, ScanLine, Sparkles, Zap } from 'lucide-react'
 import { useDigitPrediction } from './hooks/useDigitPrediction'
 
 export default function App() {
