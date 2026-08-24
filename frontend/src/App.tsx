@@ -1,21 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Activity, Cpu, Eraser, Gauge, ScanLine, Sparkles, Zap } from 'lucide-react'
-
-const initialConfidence = [
-  { digit: '7', score: 98.4 },
-  { digit: '1', score: 0.7 },
-  { digit: '9', score: 0.4 },
-  { digit: '3', score: 0.2 },
-  { digit: '2', score: 0.1 },
-]
+import { useDigitPrediction } from './hooks/useDigitPrediction'
 
 export default function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const drawingRef = useRef(false)
   const [hasInk, setHasInk] = useState(false)
-  const [scanning, setScanning] = useState(false)
-  const [predicted, setPredicted] = useState(false)
-  const [confidence, setConfidence] = useState(initialConfidence)
+
+  const { scanning, result, predict: runPrediction, reset, latencyMs } = useDigitPrediction();
 
   const resizeCanvas = useCallback(() => {
     const canvas = canvasRef.current
@@ -26,6 +18,10 @@ export default function App() {
     canvas.height = rect.height * ratio
     const context = canvas.getContext('2d')
     if (context) {
+
+      context.fillStyle = '#000000'
+      context.fillRect(0, 0, canvas.width, canvas.height)
+
       context.scale(ratio, ratio)
       context.lineCap = 'round'
       context.lineJoin = 'round'
@@ -59,7 +55,6 @@ export default function App() {
     context.beginPath()
     context.moveTo(position.x, position.y)
     setHasInk(true)
-    setPredicted(false)
   }
 
   const draw = (event: React.PointerEvent<HTMLCanvasElement>) => {
@@ -79,20 +74,18 @@ export default function App() {
   const clearCanvas = () => {
     const canvas = canvasRef.current
     const context = canvas?.getContext('2d')
-    if (!canvas || !context) return
+    if (!canvas || !context) return;
     context.clearRect(0, 0, canvas.width, canvas.height)
+    context.fillStyle = '#000000'
+    context.fillRect(0, 0, canvas.width, canvas.height)
     setHasInk(false)
-    setPredicted(false)
+    reset();
   }
 
   const predict = () => {
-    if (!hasInk || scanning) return
-    setScanning(true)
-    window.setTimeout(() => {
-      setConfidence(initialConfidence)
-      setScanning(false)
-      setPredicted(true)
-    }, 850)
+    const canvas = canvasRef.current;
+    if (!hasInk || scanning || !canvas) return;
+    runPrediction(canvas)
   }
 
   return (
@@ -138,9 +131,31 @@ export default function App() {
 
           <section className="panel p-5 md:p-6" aria-labelledby="result-title">
             <div className="mb-8 flex items-center justify-between border-b border-border/70 pb-4 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground"><span id="result-title" className="flex items-center gap-2 text-foreground"><span className="text-cyan">02</span> Inference result</span><Gauge size={15} className="text-cyan" /></div>
-            <div className={`result-display ${predicted ? 'result-live' : ''}`}><span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Top classification</span><strong>{predicted ? '7' : '—'}</strong><span className="font-mono text-xs text-cyan">{predicted ? '98.4% confidence' : 'Awaiting input'}</span></div>
-            <div className="mt-8"><div className="mb-4 flex justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground"><span>Probability field</span><span>Score</span></div><div className="space-y-4">{confidence.map((item, index) => <div key={item.digit} className="confidence-row"><span className="w-4 font-mono text-xs text-foreground">{item.digit}</span><div className="bar-track"><div className={`bar-fill ${index === 0 && predicted ? 'bar-active' : ''}`} style={{ width: `${predicted ? item.score : 0}%` }} /></div><span className="w-12 text-right font-mono text-[11px] text-muted-foreground">{predicted ? `${item.score.toFixed(1)}%` : '—'}</span></div>)}</div></div>
-            <div className="mt-9 border-t border-border/70 pt-4 font-mono text-[10px] uppercase tracking-[0.17em] text-muted-foreground"><div className="flex justify-between"><span>Latency</span><span className="text-foreground">{predicted ? '42 ms' : '—'}</span></div><div className="mt-3 flex justify-between"><span>Model state</span><span className="text-amber">{scanning ? 'Computing' : 'Standby'}</span></div></div>
+            <div className={`result-display ${result ? 'result-live' : ''}`}>
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Top classification</span><strong>{result ? result.prediction : '—'}</strong><span className="font-mono text-xs text-cyan">{result ? `${(result.probabilities[String(result.prediction)] * 100).toFixed(1)}% confidence` : 'Awaiting input'}</span>
+            </div>
+            <div className="mt-8">
+              <div className="mb-4 flex justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                <span>Probability field</span><span>Score</span>
+              </div>
+              <div className="space-y-4">
+                {
+                  Object.entries(result?.probabilities ?? {})
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 5)
+                    .map(([digit, score], index) => (
+                      <div key={digit} className="confidence-row">
+                        <span className="w-4 font-mono text-xs text-foreground">{digit}</span>
+                        <div className="bar-track">
+                          <div className={`bar-fill ${index === 0 ? 'bar-active' : ''}`} style={{ width: `${score * 100}%` }} />
+                        </div>
+                        <span className="w-12 text-right font-mono text-[11px] text-muted-foreground">{`${(score * 100).toFixed(1)}%`}</span>
+                      </div>
+                    ))
+                }
+              </div>
+            </div>
+            <div className="mt-9 border-t border-border/70 pt-4 font-mono text-[10px] uppercase tracking-[0.17em] text-muted-foreground"><div className="flex justify-between"><span>Latency</span><span className="text-foreground">{latencyMs !== null ? `${latencyMs} ms` : '—'}</span></div><div className="mt-3 flex justify-between"><span>Model state</span><span className="text-amber">{scanning ? 'Computing' : 'Standby'}</span></div></div>
           </section>
         </div>
       </div>
