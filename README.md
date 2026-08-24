@@ -11,6 +11,10 @@
 
 Full-stack application that recognizes handwritten digits in real time. The user draws a number on a canvas, and a Machine Learning model trained on the MNIST dataset predicts which digit it is, along with the full probability distribution across all 10 possible classes.
 
+**🔗 Live demo:** [https://digit-recognizer-frontend.onrender.com](https://digit-recognizer-frontend.onrender.com)
+ 
+> ⚠️ **Note:** the backend is hosted on Render's free tier, which spins down after periods of inactivity. The first request after idle time may take 30–60 seconds to respond while the service wakes up — please be patient on your first prediction.
+
 ## 🎯 Project goal
 
 This project started as a hands-on exercise to apply, end to end, the core concepts from a first Machine Learning course: supervised learning, logistic regression, cost functions, and gradient descent. The goal wasn't to build something innovative, but to prove the ability to take those theoretical concepts and turn them into a real, usable, interactive application — from training the model to a UI that anyone can actually try out.
